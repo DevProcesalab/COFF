@@ -1,0 +1,11 @@
+Flask==2.0.1
+google-cloud
+google-cloud-vision
+google-cloud-bigquery
+python-facebook-api
+facebook-business
+facebookads
+pandas
+facebook-sdk==3.1.0
+xlrd
+arrow
