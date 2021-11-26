@@ -4,14 +4,14 @@ from facebook_business.adobjects.offlineconversiondataset import OfflineConversi
 from facebook_business.api import FacebookAdsApi
 from numpy import False_, NaN, isnan
 
-# Clase Principal de Python 
+# Clase Principal de Python
 class FacebookService:
     # Función Contructora para inicializar variable y pixel offline Galax de Crystal
     def __init__(self):
         self.api = FacebookAdsApi.init(app_id='428798558259333', app_secret='758101ec30cecbfa9399700e9f1e1d5f',
         access_token='EAAGFZCXGZByIUBAK7BmflvcmZA05Y8B0rLxebZCz1UYLlNVfPSgdBUnnv7DRcZAi2r0lFgT6lNXzazFBDJUMZAVVHweKfdN6v8QSXVhUJH4rKNC33YzFr8xVgBWBDVInl8rqyXiTJAwVtFZBqgjnYIZCZBeFc7DCtiP1YPiPAWGCqCf37xJ1Xr4bUoeZC6ZAQZCERwHsOesM79019AZDZD')
         self.offline_dataset = OfflineConversionDataSet('624148101827847')
-        
+
     # Función procesa y carga la data dias Lunes, Miercoles y Viernes
     def upload_offline_conversion(self):
         # Inicializar librerias
@@ -21,6 +21,7 @@ class FacebookService:
         import datetime
         from ftplib import FTP
         from io import BytesIO
+        import json
         # Inicializar variable y arreglos
         files=[]
         lines=[]
@@ -38,7 +39,7 @@ class FacebookService:
             ftp = FTP(host)
             ftp.login(user,password)
             print('Conexion establecida')
-        
+
         except Exception as e:
             print('Conexión Errada: '+str(e))
 
@@ -52,7 +53,7 @@ class FacebookService:
         yesterday = date.today() - timedelta(days=1)
         fecha_hoy = pd.to_datetime('today').strftime('%m-%d-%y')
         # fecha_hoy = '11-22-21'
- 
+
         for line in lines:
             tokens = line.split(maxsplit = 9)
             # print(tokens[0]+" - "+tokens[3])
@@ -69,7 +70,7 @@ class FacebookService:
                 files.append(tokens[3])
                 r = BytesIO()
                 ftp.retrbinary('RETR /Mercadeo_Ventasoff/'+tokens[3], r.write)
-                
+
                 # convierte bite en string
                 data = str(r.getvalue().decode('utf8'))
 
@@ -112,7 +113,7 @@ class FacebookService:
                         textst=textst.replace("Ó", "O")
                         textst=textst.replace("Ú", "U")
                         textst=textst.replace("Ñ", "N")
-                        
+
                         # corregir fechas de evento que vienen vacias
                         tempDateString = row.split('","')[13]
                         if(tempDateString==""):
@@ -125,7 +126,7 @@ class FacebookService:
                             dobfinal = ""
                         else:
                             dobfinal=row.split('","')[9]
-                        
+
                         # validar genero VACIO
                         genfinal = ""
                         gentemp = row.split('","')[11]
@@ -167,7 +168,7 @@ class FacebookService:
 
                         textemail=str(row.split('","')[0])
                         textphone=str(row.split('","')[1])
-                        
+
                         # convertir fecha de evento a formato unix linux
                         fechaevento=datetime.datetime.strptime(tempDateString, "%d/%m/%Y").replace(tzinfo=datetime.timezone.utc).timestamp()
                         fechaevento1 = int(fechaevento)
@@ -205,13 +206,13 @@ class FacebookService:
                         textIni=textIni.replace('\"','\'')
 
                         dataArray["data"].append(textIni)
-                    
+
                     cont=cont+1
                     # print(cont)
 
-                # Descomentar linea 208 para Imprimir información cargada 
+                # Descomentar linea 208 para Imprimir información cargada
                 # print(dataArray["data"])
-                # Descomentar lineas 210,211 para Imprimir información en un json 
+                # Descomentar lineas 216,217 para Imprimir información en un json
                 # with open("test3.json","w")as f:
                 #     json.dump(dataArray,f,indent=4)
                 # retorna información
@@ -221,16 +222,15 @@ class FacebookService:
 
 a=FacebookService()
 vista = a.upload_offline_conversion()
-print(vista)
+#print(vista)
 
 # app = Flask(__name__)
-
+#
 # @app.route('/')
 # def hello():
 #     a=FacebookService()
 #     vista = a.upload_offline_conversion()
 #     return vista
-
+#
 # if __name__ == '__main__':
 #     app.run(host='127.0.0.1', port=8080, debug=True)
-
