@@ -21,13 +21,19 @@ class FacebookService:
         import datetime
         from ftplib import FTP
         from io import BytesIO
+        import json
         # Inicializar variable y arreglos
         files=[]
         lines=[]
         listTemp = []
         cuenta_temp = ''
         # Inicializar arreglo principal
+        
+        dataArrayVista = {"upload_tag": "base.csv","data":[]}
         dataArray = {"upload_tag": "base.csv","data":[]}
+        dataArray1 = {"upload_tag": "base.csv","data":[]}
+        dataArray2 = {"upload_tag": "base.csv","data":[]}
+        dataArray3 = {"upload_tag": "base.csv","data":[]}
         # Inicializar variables de conexion al servidor ftp Crystal
         host = 'intfs.crystal.com.co'
         user  = 'ftpadbid'
@@ -51,7 +57,7 @@ class FacebookService:
         # Inicializar variables fechas de proceso
         yesterday = date.today() - timedelta(days=1)
         fecha_hoy = pd.to_datetime('today').strftime('%m-%d-%y')
-        # fecha_hoy = '11-22-21'
+        # fecha_hoy = '11-26-21'
  
         for line in lines:
             tokens = line.split(maxsplit = 9)
@@ -63,7 +69,11 @@ class FacebookService:
             # Si corresponde a extensión GLX y fecha hoy
             if((tokens[0]==fecha_hoy) & (cuenta_temp=='GLX.csv')):
                 # asigna nombre del documento de hoy a upload_tag
+                dataArrayVista["upload_tag"]=tokens[3]
                 dataArray["upload_tag"]=tokens[3]
+                dataArray1["upload_tag"]=tokens[3].split('.')[0]+"_1."+tokens[3].split('.')[1]
+                dataArray2["upload_tag"]=tokens[3].split('.')[0]+"_2."+tokens[3].split('.')[1]
+                dataArray3["upload_tag"]=tokens[3].split('.')[0]+"_3."+tokens[3].split('.')[1]
 
                 # extrae datos directos del archivo de la cuenta de Galax de hoy
                 files.append(tokens[3])
@@ -78,136 +88,607 @@ class FacebookService:
                 # print(datatemp)
 
                 cont=0
+                cont1=0
                 total=len(datatemp)-1
                 # Recorre data
-                for row in datatemp:
-                    # empieze a recorrer la data desde 1 hast final del array
-                    if((cont>0) and (cont<total)):
-                        # Validar quitar tilde de ciudades y paises
-                        textct=row.split('","')[6]
-                        textst=row.split('","')[7]
+                if total <= 1500:
+                    for row in datatemp:
+                        if((cont>0) and (cont<total)):
 
-                        textct=textct.replace("á", "a")
-                        textct=textct.replace("é", "e")
-                        textct=textct.replace("í", "i")
-                        textct=textct.replace("ó", "o")
-                        textct=textct.replace("ú", "u")
-                        textct=textct.replace("ñ", "n")
-                        textct=textct.replace("Á", "A")
-                        textct=textct.replace("É", "E")
-                        textct=textct.replace("Í", "I")
-                        textct=textct.replace("Ó", "O")
-                        textct=textct.replace("Ú", "U")
-                        textct=textct.replace("Ñ", "N")
+                            TipoExtensionArray=1
+                            textct=row.split('","')[6]
+                            textst=row.split('","')[7]
 
-                        textst=textst.replace("á", "a")
-                        textst=textst.replace("é", "e")
-                        textst=textst.replace("í", "i")
-                        textst=textst.replace("ó", "o")
-                        textst=textst.replace("ú", "u")
-                        textst=textst.replace("ñ", "n")
-                        textst=textst.replace("Á", "A")
-                        textst=textst.replace("É", "E")
-                        textst=textst.replace("Í", "I")
-                        textst=textst.replace("Ó", "O")
-                        textst=textst.replace("Ú", "U")
-                        textst=textst.replace("Ñ", "N")
-                        
-                        # corregir fechas de evento que vienen vacias
-                        tempDateString = row.split('","')[13]
-                        if(tempDateString==""):
-                            tempDateString=yesterday.strftime('%d/%m/%Y')
+                            textct=textct.replace("á", "a")
+                            textct=textct.replace("é", "e")
+                            textct=textct.replace("í", "i")
+                            textct=textct.replace("ó", "o")
+                            textct=textct.replace("ú", "u")
+                            textct=textct.replace("ñ", "n")
+                            textct=textct.replace("Á", "A")
+                            textct=textct.replace("É", "E")
+                            textct=textct.replace("Í", "I")
+                            textct=textct.replace("Ó", "O")
+                            textct=textct.replace("Ú", "U")
+                            textct=textct.replace("Ñ", "N")
 
-                        # validar fechas de cumpleaños 0-0-0
-                        dobfinal = ""
-                        tempdob = row.split('","')[9]
-                        if (tempdob=="0-0-0"):
+                            textst=textst.replace("á", "a")
+                            textst=textst.replace("é", "e")
+                            textst=textst.replace("í", "i")
+                            textst=textst.replace("ó", "o")
+                            textst=textst.replace("ú", "u")
+                            textst=textst.replace("ñ", "n")
+                            textst=textst.replace("Á", "A")
+                            textst=textst.replace("É", "E")
+                            textst=textst.replace("Í", "I")
+                            textst=textst.replace("Ó", "O")
+                            textst=textst.replace("Ú", "U")
+                            textst=textst.replace("Ñ", "N")
+
+                            # print("city",textct)
+                            # print("state",textst)
+                            
+                            # corregir fechas de evento que vienen vacias
+                            # print(row.split('","')[13])
+                            tempDateString = row.split('","')[13]
+                            if(tempDateString==""):
+                                tempDateString=yesterday.strftime('%d/%m/%Y')
+
+                            # validar fechas de cumpleaños 0-0-0
                             dobfinal = ""
-                        else:
-                            dobfinal=row.split('","')[9]
-                        
-                        # validar genero VACIO
-                        genfinal = ""
-                        gentemp = row.split('","')[11]
-                        if (gentemp=="VACIO"):
+                            tempdob = row.split('","')[9]
+                            if (tempdob=="0-0-0"):
+                                dobfinal = ""
+                            else:
+                                dobfinal=row.split('","')[9]
+                            
+                            # validar genero VACIO
                             genfinal = ""
-                        else:
-                            genfinal=row.split('","')[11]
+                            gentemp = row.split('","')[11]
+                            if (gentemp=="VACIO"):
+                                genfinal = ""
+                            else:
+                                genfinal=row.split('","')[11]
 
-                        # Corregir tildes nombres y apellidos
-                        textfn=str(row.split('","')[3])
-                        textln=str(row.split('","')[4])
+                            # Replace
+                            textfn=str(row.split('","')[3])
+                            textln=str(row.split('","')[4])
 
-                        textfn=textfn.replace("á", "a")
-                        textfn=textfn.replace("é", "e")
-                        textfn=textfn.replace("í", "i")
-                        textfn=textfn.replace("ó", "o")
-                        textfn=textfn.replace("ú", "u")
-                        textfn=textfn.replace("ñ", "n")
-                        textfn=textfn.replace("Á", "A")
-                        textfn=textfn.replace("É", "E")
-                        textfn=textfn.replace("Í", "I")
-                        textfn=textfn.replace("Ó", "O")
-                        textfn=textfn.replace("Ú", "U")
-                        textfn=textfn.replace("Ñ", "N")
+                            textfn=textfn.replace("á", "a")
+                            textfn=textfn.replace("é", "e")
+                            textfn=textfn.replace("í", "i")
+                            textfn=textfn.replace("ó", "o")
+                            textfn=textfn.replace("ú", "u")
+                            textfn=textfn.replace("ñ", "n")
+                            textfn=textfn.replace("Á", "A")
+                            textfn=textfn.replace("É", "E")
+                            textfn=textfn.replace("Í", "I")
+                            textfn=textfn.replace("Ó", "O")
+                            textfn=textfn.replace("Ú", "U")
+                            textfn=textfn.replace("Ñ", "N")
 
-                        textln=textln.replace("á", "a")
-                        textln=textln.replace("é", "e")
-                        textln=textln.replace("í", "i")
-                        textln=textln.replace("ó", "o")
-                        textln=textln.replace("ú", "u")
-                        textln=textln.replace("ñ", "n")
-                        textln=textln.replace("Á", "A")
-                        textln=textln.replace("É", "E")
-                        textln=textln.replace("Í", "I")
-                        textln=textln.replace("Ó", "O")
-                        textln=textln.replace("Ú", "U")
-                        textln=textln.replace("Ñ", "N")
+                            textln=textln.replace("á", "a")
+                            textln=textln.replace("é", "e")
+                            textln=textln.replace("í", "i")
+                            textln=textln.replace("ó", "o")
+                            textln=textln.replace("ú", "u")
+                            textln=textln.replace("ñ", "n")
+                            textln=textln.replace("Á", "A")
+                            textln=textln.replace("É", "E")
+                            textln=textln.replace("Í", "I")
+                            textln=textln.replace("Ó", "O")
+                            textln=textln.replace("Ú", "U")
+                            textln=textln.replace("Ñ", "N")
 
+                            # print(type(row.split('","')[0]))
+                            # print(time.mktime(datetime.datetime.strptime(tempDateString, "%d/%m/%Y").timetuple()))
+                            temp_email=str(row.split('","')[0])
+                            textemail = temp_email[1:]
+                            textphone=str(row.split('","')[1])
 
-                        textemail=str(row.split('","')[0])
-                        textphone=str(row.split('","')[1])
+                            # print(textemail)
+                            # fechaeventopru=datetime.datetime.strptime(tempDateString, "%d/%m/%Y")
+                            # print(fechaeventopru)
+                            fechaevento=datetime.datetime.strptime(tempDateString, "%d/%m/%Y").replace(tzinfo=datetime.timezone.utc).timestamp()
+                            fechaevento1 = int(fechaevento)
+                            # print(fechaevento1,str(type(fechaevento1)))
+                            # fechaevento2 = fechaevento.replace('.','')
+
+                            # opcion4
+                            if ((textst=="") & (textst=="")):
+                                textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                            elif(textct ==""):
+                                textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                            elif (textst==""):
+                                textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                            else:
+                                textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+
+                            # remplazar backslahs
+                            # print(textIni)
+                            textIni=textIni.replace('\"','\'')
+
+                            dataArray["data"].append(textIni)
+                            dataArrayVista["data"].append(textIni)
                         
-                        # convertir fecha de evento a formato unix linux
-                        fechaevento=datetime.datetime.strptime(tempDateString, "%d/%m/%Y").replace(tzinfo=datetime.timezone.utc).timestamp()
-                        fechaevento1 = int(fechaevento)
+                        cont=cont+1
+                        # print(cont)
 
-                        # opcion1
-                        # dataArray["data"].append({
-                        #     'match_keys': {
-                        #         'phone': [hashlib.sha256(textphone.encode()).hexdigest()],
-                        #         'email': [hashlib.sha256(textemail.encode()).hexdigest()],
-                        #         'fn': hashlib.sha256(textfn.encode()).hexdigest(),
-                        #         'ln': hashlib.sha256(textln.encode()).hexdigest(),
-                        #         'ct': hashlib.sha256(textct.encode()).hexdigest(),
-                        #         'st': hashlib.sha256(textst.encode()).hexdigest(),
-                        #         'gen': hashlib.sha256(row.split('","')[11].encode()).hexdigest(),
-                        #         'dob': hashlib.sha256(dobfinal.encode()).hexdigest()
-                        #     },
-                        #     'currency':'COP',
-                        #     'value': row.split('","')[14],
-                        #     'event_name': row.split('","')[15],
-                        #     'event_time': fechaevento1
-                        # })
+                else:
+                    if total >= 1500:
+                        for row in datatemp:
+                            if((cont1>0) and (cont1<=1500)):
+                                TipoExtensionArray=1
+                                textct=row.split('","')[6]
+                                textst=row.split('","')[7]
 
-                        # opcion2
-                        # textIni='{"match_keys": {'+'"email":"'+hashlib.sha256(textemail.encode()).hexdigest()+'",'+'"phone":"'+hashlib.sha256(textphone.encode()).hexdigest()+'",'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'"'+'},'+'"currency":"COP",'+'"value":"'+str(row.split('","')[14])+'",'+'"event_name":"'+row.split('","')[15]+'",'+'"event_time":"'+str(fechaevento1)+'"'+'}'
+                                textct=textct.replace("á", "a")
+                                textct=textct.replace("é", "e")
+                                textct=textct.replace("í", "i")
+                                textct=textct.replace("ó", "o")
+                                textct=textct.replace("ú", "u")
+                                textct=textct.replace("ñ", "n")
+                                textct=textct.replace("Á", "A")
+                                textct=textct.replace("É", "E")
+                                textct=textct.replace("Í", "I")
+                                textct=textct.replace("Ó", "O")
+                                textct=textct.replace("Ú", "U")
+                                textct=textct.replace("Ñ", "N")
 
-                        # opcion3
-                        # print(row.split('","')[14])
-                        # textIni="{'match_keys': {"+"'email':'"+hashlib.sha256(textemail.encode()).hexdigest()+"',"+"'phone':'"+hashlib.sha256(textphone.encode()).hexdigest()+"',"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':'"+row.split('","')[14]+"',"+"'event_name':'"+row.split('","')[15]+"',"+"'event_time':'"+str(fechaevento1)+"'"+"}"
+                                textst=textst.replace("á", "a")
+                                textst=textst.replace("é", "e")
+                                textst=textst.replace("í", "i")
+                                textst=textst.replace("ó", "o")
+                                textst=textst.replace("ú", "u")
+                                textst=textst.replace("ñ", "n")
+                                textst=textst.replace("Á", "A")
+                                textst=textst.replace("É", "E")
+                                textst=textst.replace("Í", "I")
+                                textst=textst.replace("Ó", "O")
+                                textst=textst.replace("Ú", "U")
+                                textst=textst.replace("Ñ", "N")
 
-                        # opcion4
-                        textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+'}'
+                                # print("city",textct)
+                                # print("state",textst)
+                                
+                                # corregir fechas de evento que vienen vacias
+                                # print(row.split('","')[13])
+                                tempDateString = row.split('","')[13]
+                                if(tempDateString==""):
+                                    tempDateString=yesterday.strftime('%d/%m/%Y')
 
+                                # validar fechas de cumpleaños 0-0-0
+                                dobfinal = ""
+                                tempdob = row.split('","')[9]
+                                if (tempdob=="0-0-0"):
+                                    dobfinal = ""
+                                else:
+                                    dobfinal=row.split('","')[9]
+                                
+                                # validar genero VACIO
+                                genfinal = ""
+                                gentemp = row.split('","')[11]
+                                if (gentemp=="VACIO"):
+                                    genfinal = ""
+                                else:
+                                    genfinal=row.split('","')[11]
 
-                        # remplazar y backslahs por comilla simples
-                        textIni=textIni.replace('\"','\'')
+                                # Replace
+                                textfn=str(row.split('","')[3])
+                                textln=str(row.split('","')[4])
 
-                        dataArray["data"].append(textIni)
-                    
-                    cont=cont+1
-                    # print(cont)
+                                textfn=textfn.replace("á", "a")
+                                textfn=textfn.replace("é", "e")
+                                textfn=textfn.replace("í", "i")
+                                textfn=textfn.replace("ó", "o")
+                                textfn=textfn.replace("ú", "u")
+                                textfn=textfn.replace("ñ", "n")
+                                textfn=textfn.replace("Á", "A")
+                                textfn=textfn.replace("É", "E")
+                                textfn=textfn.replace("Í", "I")
+                                textfn=textfn.replace("Ó", "O")
+                                textfn=textfn.replace("Ú", "U")
+                                textfn=textfn.replace("Ñ", "N")
+
+                                textln=textln.replace("á", "a")
+                                textln=textln.replace("é", "e")
+                                textln=textln.replace("í", "i")
+                                textln=textln.replace("ó", "o")
+                                textln=textln.replace("ú", "u")
+                                textln=textln.replace("ñ", "n")
+                                textln=textln.replace("Á", "A")
+                                textln=textln.replace("É", "E")
+                                textln=textln.replace("Í", "I")
+                                textln=textln.replace("Ó", "O")
+                                textln=textln.replace("Ú", "U")
+                                textln=textln.replace("Ñ", "N")
+
+                                # print(type(row.split('","')[0]))
+                                # print(time.mktime(datetime.datetime.strptime(tempDateString, "%d/%m/%Y").timetuple()))
+                                temp_email=str(row.split('","')[0])
+                                textemail = temp_email[1:]
+                                textphone=str(row.split('","')[1])
+
+                                # print(textemail)
+                                # fechaeventopru=datetime.datetime.strptime(tempDateString, "%d/%m/%Y")
+                                # print(fechaeventopru)
+                                fechaevento=datetime.datetime.strptime(tempDateString, "%d/%m/%Y").replace(tzinfo=datetime.timezone.utc).timestamp()
+                                fechaevento1 = int(fechaevento)
+                                # print(fechaevento1,str(type(fechaevento1)))
+                                # fechaevento2 = fechaevento.replace('.','')
+
+                                # opcion4
+                                if ((textst=="") & (textst=="")):
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                elif(textct ==""):
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                elif(textst==""):
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                else:
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+
+                                # remplazar backslahs
+                                # print(textIni)
+                                textIni=textIni.replace('\"','\'')
+
+                                dataArray["data"].append(textIni)
+                                dataArrayVista["data"].append(textIni)
+
+                            elif((cont1>=1501) & (cont1<=3000) & (cont1<total)):
+                                TipoExtensionArray=2
+                                
+                                textct=row.split('","')[6]
+                                textst=row.split('","')[7]
+
+                                textct=textct.replace("á", "a")
+                                textct=textct.replace("é", "e")
+                                textct=textct.replace("í", "i")
+                                textct=textct.replace("ó", "o")
+                                textct=textct.replace("ú", "u")
+                                textct=textct.replace("ñ", "n")
+                                textct=textct.replace("Á", "A")
+                                textct=textct.replace("É", "E")
+                                textct=textct.replace("Í", "I")
+                                textct=textct.replace("Ó", "O")
+                                textct=textct.replace("Ú", "U")
+                                textct=textct.replace("Ñ", "N")
+
+                                textst=textst.replace("á", "a")
+                                textst=textst.replace("é", "e")
+                                textst=textst.replace("í", "i")
+                                textst=textst.replace("ó", "o")
+                                textst=textst.replace("ú", "u")
+                                textst=textst.replace("ñ", "n")
+                                textst=textst.replace("Á", "A")
+                                textst=textst.replace("É", "E")
+                                textst=textst.replace("Í", "I")
+                                textst=textst.replace("Ó", "O")
+                                textst=textst.replace("Ú", "U")
+                                textst=textst.replace("Ñ", "N")
+
+                                # print("city",textct)
+                                # print("state",textst)
+                                
+                                # corregir fechas de evento que vienen vacias
+                                # print(row.split('","')[13])
+                                tempDateString = row.split('","')[13]
+                                if(tempDateString==""):
+                                    tempDateString=yesterday.strftime('%d/%m/%Y')
+
+                                # validar fechas de cumpleaños 0-0-0
+                                dobfinal = ""
+                                tempdob = row.split('","')[9]
+                                if (tempdob=="0-0-0"):
+                                    dobfinal = ""
+                                else:
+                                    dobfinal=row.split('","')[9]
+                                
+                                # validar genero VACIO
+                                genfinal = ""
+                                gentemp = row.split('","')[11]
+                                if (gentemp=="VACIO"):
+                                    genfinal = ""
+                                else:
+                                    genfinal=row.split('","')[11]
+
+                                # Replace
+                                textfn=str(row.split('","')[3])
+                                textln=str(row.split('","')[4])
+
+                                textfn=textfn.replace("á", "a")
+                                textfn=textfn.replace("é", "e")
+                                textfn=textfn.replace("í", "i")
+                                textfn=textfn.replace("ó", "o")
+                                textfn=textfn.replace("ú", "u")
+                                textfn=textfn.replace("ñ", "n")
+                                textfn=textfn.replace("Á", "A")
+                                textfn=textfn.replace("É", "E")
+                                textfn=textfn.replace("Í", "I")
+                                textfn=textfn.replace("Ó", "O")
+                                textfn=textfn.replace("Ú", "U")
+                                textfn=textfn.replace("Ñ", "N")
+
+                                textln=textln.replace("á", "a")
+                                textln=textln.replace("é", "e")
+                                textln=textln.replace("í", "i")
+                                textln=textln.replace("ó", "o")
+                                textln=textln.replace("ú", "u")
+                                textln=textln.replace("ñ", "n")
+                                textln=textln.replace("Á", "A")
+                                textln=textln.replace("É", "E")
+                                textln=textln.replace("Í", "I")
+                                textln=textln.replace("Ó", "O")
+                                textln=textln.replace("Ú", "U")
+                                textln=textln.replace("Ñ", "N")
+
+                                # print(type(row.split('","')[0]))
+                                # print(time.mktime(datetime.datetime.strptime(tempDateString, "%d/%m/%Y").timetuple()))
+                                temp_email=str(row.split('","')[0])
+                                textemail = temp_email[1:]
+                                textphone=str(row.split('","')[1])
+
+                                # print(textemail)
+                                # fechaeventopru=datetime.datetime.strptime(tempDateString, "%d/%m/%Y")
+                                # print(fechaeventopru)
+                                fechaevento=datetime.datetime.strptime(tempDateString, "%d/%m/%Y").replace(tzinfo=datetime.timezone.utc).timestamp()
+                                fechaevento1 = int(fechaevento)
+                                # print(fechaevento1,str(type(fechaevento1)))
+                                # fechaevento2 = fechaevento.replace('.','')
+
+                                # opcion4
+                                if ((textst=="") & (textst=="")):
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                elif(textct ==""):
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                elif(textst==""):
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                else:
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+
+                                # remplazar backslahs
+                                # print(textIni)
+                                textIni=textIni.replace('\"','\'')
+
+                                dataArray1["data"].append(textIni)
+                                dataArrayVista["data"].append(textIni)
+
+                            elif((cont1>=3001) & (cont1<=4500) & (cont1<total)):
+                                TipoExtensionArray=3
+                                textct=row.split('","')[6]
+                                textst=row.split('","')[7]
+
+                                textct=textct.replace("á", "a")
+                                textct=textct.replace("é", "e")
+                                textct=textct.replace("í", "i")
+                                textct=textct.replace("ó", "o")
+                                textct=textct.replace("ú", "u")
+                                textct=textct.replace("ñ", "n")
+                                textct=textct.replace("Á", "A")
+                                textct=textct.replace("É", "E")
+                                textct=textct.replace("Í", "I")
+                                textct=textct.replace("Ó", "O")
+                                textct=textct.replace("Ú", "U")
+                                textct=textct.replace("Ñ", "N")
+
+                                textst=textst.replace("á", "a")
+                                textst=textst.replace("é", "e")
+                                textst=textst.replace("í", "i")
+                                textst=textst.replace("ó", "o")
+                                textst=textst.replace("ú", "u")
+                                textst=textst.replace("ñ", "n")
+                                textst=textst.replace("Á", "A")
+                                textst=textst.replace("É", "E")
+                                textst=textst.replace("Í", "I")
+                                textst=textst.replace("Ó", "O")
+                                textst=textst.replace("Ú", "U")
+                                textst=textst.replace("Ñ", "N")
+
+                                # print("city",textct)
+                                # print("state",textst)
+                                
+                                # corregir fechas de evento que vienen vacias
+                                # print(row.split('","')[13])
+                                tempDateString = row.split('","')[13]
+                                if(tempDateString==""):
+                                    tempDateString=yesterday.strftime('%d/%m/%Y')
+
+                                # validar fechas de cumpleaños 0-0-0
+                                dobfinal = ""
+                                tempdob = row.split('","')[9]
+                                if (tempdob=="0-0-0"):
+                                    dobfinal = ""
+                                else:
+                                    dobfinal=row.split('","')[9]
+                                
+                                # validar genero VACIO
+                                genfinal = ""
+                                gentemp = row.split('","')[11]
+                                if (gentemp=="VACIO"):
+                                    genfinal = ""
+                                else:
+                                    genfinal=row.split('","')[11]
+
+                                # Replace
+                                textfn=str(row.split('","')[3])
+                                textln=str(row.split('","')[4])
+
+                                textfn=textfn.replace("á", "a")
+                                textfn=textfn.replace("é", "e")
+                                textfn=textfn.replace("í", "i")
+                                textfn=textfn.replace("ó", "o")
+                                textfn=textfn.replace("ú", "u")
+                                textfn=textfn.replace("ñ", "n")
+                                textfn=textfn.replace("Á", "A")
+                                textfn=textfn.replace("É", "E")
+                                textfn=textfn.replace("Í", "I")
+                                textfn=textfn.replace("Ó", "O")
+                                textfn=textfn.replace("Ú", "U")
+                                textfn=textfn.replace("Ñ", "N")
+
+                                textln=textln.replace("á", "a")
+                                textln=textln.replace("é", "e")
+                                textln=textln.replace("í", "i")
+                                textln=textln.replace("ó", "o")
+                                textln=textln.replace("ú", "u")
+                                textln=textln.replace("ñ", "n")
+                                textln=textln.replace("Á", "A")
+                                textln=textln.replace("É", "E")
+                                textln=textln.replace("Í", "I")
+                                textln=textln.replace("Ó", "O")
+                                textln=textln.replace("Ú", "U")
+                                textln=textln.replace("Ñ", "N")
+
+                                # print(type(row.split('","')[0]))
+                                # print(time.mktime(datetime.datetime.strptime(tempDateString, "%d/%m/%Y").timetuple()))
+                                temp_email=str(row.split('","')[0])
+                                textemail = temp_email[1:]
+                                textphone=str(row.split('","')[1])
+
+                                # print(textemail)
+                                # fechaeventopru=datetime.datetime.strptime(tempDateString, "%d/%m/%Y")
+                                # print(fechaeventopru)
+                                fechaevento=datetime.datetime.strptime(tempDateString, "%d/%m/%Y").replace(tzinfo=datetime.timezone.utc).timestamp()
+                                fechaevento1 = int(fechaevento)
+                                # print(fechaevento1,str(type(fechaevento1)))
+                                # fechaevento2 = fechaevento.replace('.','')
+
+                                # opcion4
+                                if ((textst=="") & (textst=="")):
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                elif(textct ==""):
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                elif(textst==""):
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                else:
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+
+                                # remplazar backslahs
+                                # print(textIni)
+                                textIni=textIni.replace('\"','\'')
+
+                                dataArray2["data"].append(textIni)
+                                dataArrayVista["data"].append(textIni)
+
+                            elif((cont1>=4601) and (cont1<=6000) & (cont1<total)):
+                                TipoExtensionArray=4
+                                textct=row.split('","')[6]
+                                textst=row.split('","')[7]
+
+                                textct=textct.replace("á", "a")
+                                textct=textct.replace("é", "e")
+                                textct=textct.replace("í", "i")
+                                textct=textct.replace("ó", "o")
+                                textct=textct.replace("ú", "u")
+                                textct=textct.replace("ñ", "n")
+                                textct=textct.replace("Á", "A")
+                                textct=textct.replace("É", "E")
+                                textct=textct.replace("Í", "I")
+                                textct=textct.replace("Ó", "O")
+                                textct=textct.replace("Ú", "U")
+                                textct=textct.replace("Ñ", "N")
+
+                                textst=textst.replace("á", "a")
+                                textst=textst.replace("é", "e")
+                                textst=textst.replace("í", "i")
+                                textst=textst.replace("ó", "o")
+                                textst=textst.replace("ú", "u")
+                                textst=textst.replace("ñ", "n")
+                                textst=textst.replace("Á", "A")
+                                textst=textst.replace("É", "E")
+                                textst=textst.replace("Í", "I")
+                                textst=textst.replace("Ó", "O")
+                                textst=textst.replace("Ú", "U")
+                                textst=textst.replace("Ñ", "N")
+
+                                # print("city",textct)
+                                # print("state",textst)
+                                
+                                # corregir fechas de evento que vienen vacias
+                                # print(row.split('","')[13])
+                                tempDateString = row.split('","')[13]
+                                if(tempDateString==""):
+                                    tempDateString=yesterday.strftime('%d/%m/%Y')
+
+                                # validar fechas de cumpleaños 0-0-0
+                                dobfinal = ""
+                                tempdob = row.split('","')[9]
+                                if (tempdob=="0-0-0"):
+                                    dobfinal = ""
+                                else:
+                                    dobfinal=row.split('","')[9]
+                                
+                                # validar genero VACIO
+                                genfinal = ""
+                                gentemp = row.split('","')[11]
+                                if (gentemp=="VACIO"):
+                                    genfinal = ""
+                                else:
+                                    genfinal=row.split('","')[11]
+
+                                # Replace
+                                textfn=str(row.split('","')[3])
+                                textln=str(row.split('","')[4])
+
+                                textfn=textfn.replace("á", "a")
+                                textfn=textfn.replace("é", "e")
+                                textfn=textfn.replace("í", "i")
+                                textfn=textfn.replace("ó", "o")
+                                textfn=textfn.replace("ú", "u")
+                                textfn=textfn.replace("ñ", "n")
+                                textfn=textfn.replace("Á", "A")
+                                textfn=textfn.replace("É", "E")
+                                textfn=textfn.replace("Í", "I")
+                                textfn=textfn.replace("Ó", "O")
+                                textfn=textfn.replace("Ú", "U")
+                                textfn=textfn.replace("Ñ", "N")
+
+                                textln=textln.replace("á", "a")
+                                textln=textln.replace("é", "e")
+                                textln=textln.replace("í", "i")
+                                textln=textln.replace("ó", "o")
+                                textln=textln.replace("ú", "u")
+                                textln=textln.replace("ñ", "n")
+                                textln=textln.replace("Á", "A")
+                                textln=textln.replace("É", "E")
+                                textln=textln.replace("Í", "I")
+                                textln=textln.replace("Ó", "O")
+                                textln=textln.replace("Ú", "U")
+                                textln=textln.replace("Ñ", "N")
+
+                                # print(type(row.split('","')[0]))
+                                # print(time.mktime(datetime.datetime.strptime(tempDateString, "%d/%m/%Y").timetuple()))
+                                temp_email=str(row.split('","')[0])
+                                textemail = temp_email[1:]
+                                textphone=str(row.split('","')[1])
+
+                                # print(textemail)
+                                # fechaeventopru=datetime.datetime.strptime(tempDateString, "%d/%m/%Y")
+                                # print(fechaeventopru)
+                                fechaevento=datetime.datetime.strptime(tempDateString, "%d/%m/%Y").replace(tzinfo=datetime.timezone.utc).timestamp()
+                                fechaevento1 = int(fechaevento)
+                                # print(fechaevento1,str(type(fechaevento1)))
+                                # fechaevento2 = fechaevento.replace('.','')
+
+                                # opcion4
+                                if ((textst=="") & (textst=="")):
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                elif(textct ==""):
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                elif(textst==""):
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                else:
+                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+
+                                # remplazar backslahs
+                                # print(textIni)
+                                textIni=textIni.replace('\"','\'')
+
+                                dataArray3["data"].append(textIni)
+                                dataArrayVista["data"].append(textIni)
+
+                            
+                            cont1=cont1+1
+                            # print(cont)
 
                 # Descomentar linea 208 para Imprimir información cargada 
                 # print(dataArray["data"])
@@ -215,13 +696,28 @@ class FacebookService:
                 # with open("test3.json","w")as f:
                 #     json.dump(dataArray,f,indent=4)
                 # retorna información
-                return dataArray
-                # self.offline_dataset.create_event(params=dataArray)
+                return dataArrayVista
+
+                # realiza inserción en Facebook descomentar desde 702 a la 715
+                # if (TipoExtensionArray==1):
+                #     self.offline_dataset.create_event(params=dataArray)
+                # elif (TipoExtensionArray==2):
+                #     self.offline_dataset.create_event(params=dataArray)
+                #     self.offline_dataset.create_event(params=dataArray1)
+                # elif (TipoExtensionArray==3):
+                #     self.offline_dataset.create_event(params=dataArray)
+                #     self.offline_dataset.create_event(params=dataArray1)
+                #     self.offline_dataset.create_event(params=dataArray2)
+                # elif (TipoExtensionArray==4):
+                #     self.offline_dataset.create_event(params=dataArray)
+                #     self.offline_dataset.create_event(params=dataArray1)
+                #     self.offline_dataset.create_event(params=dataArray2)
+                #     self.offline_dataset.create_event(params=dataArray3)
 
 
 a=FacebookService()
 vista = a.upload_offline_conversion()
-print(vista)
+# print(vista)
 
 # app = Flask(__name__)
 
