@@ -56,41 +56,35 @@ class FacebookService:
         ftp.dir(ftp.pwd(),lines.append)
         # Inicializar variables fechas de proceso
         yesterday = date.today() - timedelta(days=1)
-        fecha_hoy = pd.to_datetime('today').strftime('%m-%d-%y')
+        # fecha_hoy = pd.to_datetime('today').strftime('%m-%d-%y')
 
-        # fecha_hoy = '11-26-21'
+        fecha_hoy = '12-13-21'
         for line in lines:
             tokens = line.split(maxsplit = 9)
             # print(tokens[0]+" - "+tokens[3])
-            # buscar extención de archivo GLX de la cuenta Galax de Crystal
             listTemp = tokens[3].split('_')
             cuenta_temp = listTemp.pop()
-
-            # Si corresponde a extensión GLX y fecha hoy
             if((tokens[0]==fecha_hoy) & (cuenta_temp=='GLX.csv')):
-                # asigna nombre del documento de hoy a upload_tag
-                dataArrayVista["upload_tag"]=tokens[3]
                 dataArray["upload_tag"]=tokens[3]
                 dataArray1["upload_tag"]=tokens[3].split('.')[0]+"_1."+tokens[3].split('.')[1]
                 dataArray2["upload_tag"]=tokens[3].split('.')[0]+"_2."+tokens[3].split('.')[1]
                 dataArray3["upload_tag"]=tokens[3].split('.')[0]+"_3."+tokens[3].split('.')[1]
-
-                # extrae datos directos del archivo de la cuenta de Galax de hoy
+                
                 files.append(tokens[3])
                 r = BytesIO()
                 ftp.retrbinary('RETR /Mercadeo_Ventasoff/'+tokens[3], r.write)
-
-                # convierte bite en string
+                
+                # print(r.getvalue())
                 data = str(r.getvalue().decode('utf8'))
 
-                # separa datos por salto de linea
+                # print(data)
                 datatemp = data.split('\n')
                 # print(datatemp)
 
                 cont=0
                 cont1=0
+
                 total=len(datatemp)-1
-                # Recorre data
 
                 if total <= 1500:
                     for row in datatemp:
@@ -154,6 +148,8 @@ class FacebookService:
                             # Replace
                             textfn=str(row.split('","')[3])
                             textln=str(row.split('","')[4])
+                            textvalue=row.split('","')[14]
+                            texteventname=row.split('","')[15]
 
                             textfn=textfn.replace("á", "a")
                             textfn=textfn.replace("é", "e")
@@ -195,22 +191,21 @@ class FacebookService:
                             # print(fechaevento1,str(type(fechaevento1)))
                             # fechaevento2 = fechaevento.replace('.','')
 
-                            # opcion4
+                            # opción5
                             if ((textst=="") & (textst=="")):
-                                textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
-                            elif(textct ==""):
-                                textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
+                            elif (textct ==""):
+                                textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
                             elif (textst==""):
-                                textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
                             else:
-                                textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
 
                             # remplazar backslahs
                             # print(textIni)
                             textIni=textIni.replace('\"','\'')
 
                             dataArray["data"].append(textIni)
-                            dataArrayVista["data"].append(textIni)
                         
                         cont=cont+1
                         # print(cont)
@@ -277,6 +272,8 @@ class FacebookService:
                                 # Replace
                                 textfn=str(row.split('","')[3])
                                 textln=str(row.split('","')[4])
+                                textvalue=row.split('","')[14]
+                                texteventname=row.split('","')[15]
 
                                 textfn=textfn.replace("á", "a")
                                 textfn=textfn.replace("é", "e")
@@ -318,22 +315,21 @@ class FacebookService:
                                 # print(fechaevento1,str(type(fechaevento1)))
                                 # fechaevento2 = fechaevento.replace('.','')
 
-                                # opcion4
+                                # opción5
                                 if ((textst=="") & (textst=="")):
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
-                                elif(textct ==""):
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
-                                elif(textst==""):
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
+                                elif (textct ==""):
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
+                                elif (textst==""):
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
                                 else:
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
 
                                 # remplazar backslahs
                                 # print(textIni)
                                 textIni=textIni.replace('\"','\'')
 
                                 dataArray["data"].append(textIni)
-                                dataArrayVista["data"].append(textIni)
 
                             elif((cont1>=1501) & (cont1<=3000) & (cont1<total)):
                                 TipoExtensionArray=2
@@ -436,22 +432,21 @@ class FacebookService:
                                 # print(fechaevento1,str(type(fechaevento1)))
                                 # fechaevento2 = fechaevento.replace('.','')
 
-                                # opcion4
+                                # opción5
                                 if ((textst=="") & (textst=="")):
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
-                                elif(textct ==""):
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
-                                elif(textst==""):
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
+                                elif (textct ==""):
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
+                                elif (textst==""):
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
                                 else:
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
 
                                 # remplazar backslahs
                                 # print(textIni)
                                 textIni=textIni.replace('\"','\'')
 
                                 dataArray1["data"].append(textIni)
-                                dataArrayVista["data"].append(textIni)
 
                             elif((cont1>=3001) & (cont1<=4500) & (cont1<total)):
                                 TipoExtensionArray=3
@@ -553,22 +548,21 @@ class FacebookService:
                                 # print(fechaevento1,str(type(fechaevento1)))
                                 # fechaevento2 = fechaevento.replace('.','')
 
-                                # opcion4
+                                # opción5
                                 if ((textst=="") & (textst=="")):
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
-                                elif(textct ==""):
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
-                                elif(textst==""):
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
+                                elif (textct ==""):
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
+                                elif (textst==""):
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
                                 else:
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
 
-                                # remplazar backslahs
+                                # remplazar backslahs 
                                 # print(textIni)
                                 textIni=textIni.replace('\"','\'')
 
                                 dataArray2["data"].append(textIni)
-                                dataArrayVista["data"].append(textIni)
 
                             elif((cont1>=4601) and (cont1<=6000) & (cont1<total)):
                                 TipoExtensionArray=4
@@ -670,56 +664,82 @@ class FacebookService:
                                 # print(fechaevento1,str(type(fechaevento1)))
                                 # fechaevento2 = fechaevento.replace('.','')
 
-                                # opcion4
+                                # opción5
                                 if ((textst=="") & (textst=="")):
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
-                                elif(textct ==""):
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
-                                elif(textst==""):
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
+                                elif (textct ==""):
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
+                                elif (textst==""):
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
                                 else:
-                                    textIni='{match_keys: {'+'"phone":["'+hashlib.sha256(textphone.encode()).hexdigest()+'"],'+'"email":["'+hashlib.sha256(textemail.encode()).hexdigest()+'"],'+'"fn":"'+hashlib.sha256(textfn.encode()).hexdigest()+'",'+'"ln":"'+hashlib.sha256(textln.encode()).hexdigest()+'",'+'"ct":"'+hashlib.sha256(textct.encode()).hexdigest()+'",'+'"st":"'+hashlib.sha256(textst.encode()).hexdigest()+'",'+'"gen":"'+hashlib.sha256(row.split('","')[11].encode()).hexdigest()+'",'+'"dob":"'+hashlib.sha256(dobfinal.encode()).hexdigest()+'"'+'},'+'currency:"COP",'+'value:'+str(row.split('","')[14])+','+'event_name:"'+row.split('","')[15]+'",'+'event_time:'+str(fechaevento1)+',custom_data:{phone:"'+textphone+'",email:"'+textemail+'",fn:"'+textfn+'",ln:"'+textln+'",ct:"'+textct+'",st:"'+textst+'",gen:"'+row.split('","')[11]+'",dob:"'+dobfinal+'"}}'
+                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
 
                                 # remplazar backslahs
                                 # print(textIni)
                                 textIni=textIni.replace('\"','\'')
 
                                 dataArray3["data"].append(textIni)
-                                dataArrayVista["data"].append(textIni)
 
                             
                             cont1=cont1+1
                             # print(cont)
 
 
-                # Descomentar linea 208 para Imprimir información cargada
-                # print(dataArray["data"])
-                # Descomentar lineas 216,217 para Imprimir información en un json
-                # with open("test3.json","w")as f:
-                #     json.dump(dataArray,f,indent=4)
-                # retorna información
-                return dataArrayVista
+                # listArray = [(k,v) for k,v in dataArray.items()]
 
-                # realiza inserción en Facebook descomentar desde 702 a la 715
-                # if (TipoExtensionArray==1):
-                #     self.offline_dataset.create_event(params=dataArray)
-                # elif (TipoExtensionArray==2):
-                #     self.offline_dataset.create_event(params=dataArray)
-                #     self.offline_dataset.create_event(params=dataArray1)
-                # elif (TipoExtensionArray==3):
-                #     self.offline_dataset.create_event(params=dataArray)
-                #     self.offline_dataset.create_event(params=dataArray1)
-                #     self.offline_dataset.create_event(params=dataArray2)
-                # elif (TipoExtensionArray==4):
-                #     self.offline_dataset.create_event(params=dataArray)
-                #     self.offline_dataset.create_event(params=dataArray1)
-                #     self.offline_dataset.create_event(params=dataArray2)
-                #     self.offline_dataset.create_event(params=dataArray3)
+                # print(dataArray["data"])
+
+
+                # for row1 in dataArray['upload_tag']:
+                    # print(row1)
+
+
+
+                with open("dataArray.json","w")as f:
+                    json.dump(dataArray,f,indent=4)
+
+
+                with open("dataArray1.json","w")as f:
+                    json.dump(dataArray1,f,indent=4)
+
+
+                with open("dataArray2.json","w")as f:
+                    json.dump(dataArray2,f,indent=4)
+
+
+                with open("dataArray3.json","w")as f:
+                    json.dump(dataArray3,f,indent=4)
+
+        
+
+        # with open("test.json","w")as f:
+        #     json.dump(dataArray,f,indent=4)
+
+        # print(dataArray['data'][0])
+        # print(dataArray['data'][100])
+        # print(dataArray['data'][500])
+        # newvalues = json.dump(dataArray)
+        # if (TipoExtensionArray==1):
+        #     self.offline_dataset.create_event(params=dataArray)
+        # elif (TipoExtensionArray==2):
+        #     self.offline_dataset.create_event(params=dataArray)
+        #     self.offline_dataset.create_event(params=dataArray1)
+        # elif (TipoExtensionArray==3):
+        #     self.offline_dataset.create_event(params=dataArray)
+        #     self.offline_dataset.create_event(params=dataArray1)
+        #     self.offline_dataset.create_event(params=dataArray2)
+        # elif (TipoExtensionArray==4):
+        #     self.offline_dataset.create_event(params=dataArray)
+        #     self.offline_dataset.create_event(params=dataArray1)
+        #     self.offline_dataset.create_event(params=dataArray2)
+        #     self.offline_dataset.create_event(params=dataArray3)
+
+        return dataArray
 
 
 a=FacebookService()
 vista = a.upload_offline_conversion()
-# print(vista)
+print(vista)
 
 
 # app = Flask(__name__)
