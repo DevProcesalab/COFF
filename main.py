@@ -9,7 +9,7 @@ class FacebookService:
     # Función Contructora para inicializar variable y pixel offline Galax de Crystal
     def __init__(self):
         self.api = FacebookAdsApi.init(app_id='428798558259333', app_secret='758101ec30cecbfa9399700e9f1e1d5f',
-        access_token='EAAGFZCXGZByIUBAK7BmflvcmZA05Y8B0rLxebZCz1UYLlNVfPSgdBUnnv7DRcZAi2r0lFgT6lNXzazFBDJUMZAVVHweKfdN6v8QSXVhUJH4rKNC33YzFr8xVgBWBDVInl8rqyXiTJAwVtFZBqgjnYIZCZBeFc7DCtiP1YPiPAWGCqCf37xJ1Xr4bUoeZC6ZAQZCERwHsOesM79019AZDZD')
+        access_token='EAAGFZCXGZByIUBAM8wEg8T0WM2O8xLgFXAZC1bNxeeg1nQmraSMORJI2Kxovbg7ncQY8Utk2UGolW21aZCS8IqtdwjQlQraU4VuYZA5nWzZAEc1ZCerSnzlMHyEP1EZCm8TZCQdK8UQVPATPlHOqYzLBC1SDZB4GkjZBZCb7LFu5ejdSVgZDZD')
         self.offline_dataset = OfflineConversionDataSet('624148101827847')
 
     # Función procesa y carga la data dias Lunes, Miercoles y Viernes
@@ -56,9 +56,9 @@ class FacebookService:
         ftp.dir(ftp.pwd(),lines.append)
         # Inicializar variables fechas de proceso
         yesterday = date.today() - timedelta(days=1)
-        # fecha_hoy = pd.to_datetime('today').strftime('%m-%d-%y')
+        fecha_hoy = pd.to_datetime('today').strftime('%m-%d-%y')
 
-        fecha_hoy = '12-13-21'
+        # fecha_hoy = '12-13-21'
         for line in lines:
             tokens = line.split(maxsplit = 9)
             # print(tokens[0]+" - "+tokens[3])
@@ -191,16 +191,9 @@ class FacebookService:
                             # print(fechaevento1,str(type(fechaevento1)))
                             # fechaevento2 = fechaevento.replace('.','')
 
-                            # opción5
-                            if ((textst=="") & (textst=="")):
-                                textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-                            elif (textct ==""):
-                                textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-                            elif (textst==""):
-                                textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-                            else:
-                                textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-
+                            # opción6
+                            textIni="{'currency':'COP', 'event_name':'"+texteventname+"','event_time':'"+str(fechaevento1)+"', 'match_keys': {\"email\":[\""+hashlib.sha256(textemail.encode()).hexdigest()+"\"],'phone':[\""+hashlib.sha256(textphone.encode()).hexdigest()+"\"],\"fn\":\""+hashlib.sha256(textfn.encode()).hexdigest()+"\",\"ln\":\""+hashlib.sha256(textln.encode()).hexdigest()+"\"},\"value\":"+str(textvalue)+"}"
+                        
                             # remplazar backslahs
                             # print(textIni)
                             textIni=textIni.replace('\"','\'')
@@ -315,16 +308,9 @@ class FacebookService:
                                 # print(fechaevento1,str(type(fechaevento1)))
                                 # fechaevento2 = fechaevento.replace('.','')
 
-                                # opción5
-                                if ((textst=="") & (textst=="")):
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-                                elif (textct ==""):
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-                                elif (textst==""):
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-                                else:
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-
+                                # opción6
+                                textIni="{'currency':'COP', 'event_name':'"+texteventname+"','event_time':'"+str(fechaevento1)+"', 'match_keys': {\"email\":[\""+hashlib.sha256(textemail.encode()).hexdigest()+"\"],'phone':[\""+hashlib.sha256(textphone.encode()).hexdigest()+"\"],\"fn\":\""+hashlib.sha256(textfn.encode()).hexdigest()+"\",\"ln\":\""+hashlib.sha256(textln.encode()).hexdigest()+"\"},\"value\":"+str(textvalue)+"}"
+                        
                                 # remplazar backslahs
                                 # print(textIni)
                                 textIni=textIni.replace('\"','\'')
@@ -432,16 +418,9 @@ class FacebookService:
                                 # print(fechaevento1,str(type(fechaevento1)))
                                 # fechaevento2 = fechaevento.replace('.','')
 
-                                # opción5
-                                if ((textst=="") & (textst=="")):
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-                                elif (textct ==""):
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-                                elif (textst==""):
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-                                else:
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-
+                                # opción6
+                                textIni="{'currency':'COP', 'event_name':'"+texteventname+"','event_time':'"+str(fechaevento1)+"', 'match_keys': {\"email\":[\""+hashlib.sha256(textemail.encode()).hexdigest()+"\"],'phone':[\""+hashlib.sha256(textphone.encode()).hexdigest()+"\"],\"fn\":\""+hashlib.sha256(textfn.encode()).hexdigest()+"\",\"ln\":\""+hashlib.sha256(textln.encode()).hexdigest()+"\"},\"value\":"+str(textvalue)+"}"
+                        
                                 # remplazar backslahs
                                 # print(textIni)
                                 textIni=textIni.replace('\"','\'')
@@ -548,16 +527,9 @@ class FacebookService:
                                 # print(fechaevento1,str(type(fechaevento1)))
                                 # fechaevento2 = fechaevento.replace('.','')
 
-                                # opción5
-                                if ((textst=="") & (textst=="")):
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-                                elif (textct ==""):
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-                                elif (textst==""):
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-                                else:
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-
+                                # opción6
+                                textIni="{'currency':'COP', 'event_name':'"+texteventname+"','event_time':'"+str(fechaevento1)+"', 'match_keys': {\"email\":[\""+hashlib.sha256(textemail.encode()).hexdigest()+"\"],'phone':[\""+hashlib.sha256(textphone.encode()).hexdigest()+"\"],\"fn\":\""+hashlib.sha256(textfn.encode()).hexdigest()+"\",\"ln\":\""+hashlib.sha256(textln.encode()).hexdigest()+"\"},\"value\":"+str(textvalue)+"}"
+                        
                                 # remplazar backslahs 
                                 # print(textIni)
                                 textIni=textIni.replace('\"','\'')
@@ -664,16 +636,9 @@ class FacebookService:
                                 # print(fechaevento1,str(type(fechaevento1)))
                                 # fechaevento2 = fechaevento.replace('.','')
 
-                                # opción5
-                                if ((textst=="") & (textst=="")):
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-                                elif (textct ==""):
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-                                elif (textst==""):
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-                                else:
-                                    textIni="{'match_keys': {"+"'phone':['"+hashlib.sha256(textphone.encode()).hexdigest()+"'],"+"'email':['"+hashlib.sha256(textemail.encode()).hexdigest()+"'],"+"'fn':'"+hashlib.sha256(textfn.encode()).hexdigest()+"',"+"'ln':'"+hashlib.sha256(textln.encode()).hexdigest()+"',"+"'ct':'"+hashlib.sha256(textct.encode()).hexdigest()+"',"+"'st':'"+hashlib.sha256(textst.encode()).hexdigest()+"',"+"'gen':'"+hashlib.sha256(genfinal.encode()).hexdigest()+"',"+"'dob':'"+hashlib.sha256(dobfinal.encode()).hexdigest()+"'"+"},"+"'currency':'COP',"+"'value':"+str(textvalue)+","+"'event_name':'"+texteventname+"',"+"'event_time':"+str(fechaevento1)+"}"
-
+                                # opción6
+                                textIni="{'currency':'COP', 'event_name':'"+texteventname+"','event_time':'"+str(fechaevento1)+"', 'match_keys': {\"email\":[\""+hashlib.sha256(textemail.encode()).hexdigest()+"\"],'phone':[\""+hashlib.sha256(textphone.encode()).hexdigest()+"\"],\"fn\":\""+hashlib.sha256(textfn.encode()).hexdigest()+"\",\"ln\":\""+hashlib.sha256(textln.encode()).hexdigest()+"\"},\"value\":"+str(textvalue)+"}"
+                        
                                 # remplazar backslahs
                                 # print(textIni)
                                 textIni=textIni.replace('\"','\'')
@@ -695,20 +660,20 @@ class FacebookService:
 
 
 
-                with open("dataArray.json","w")as f:
-                    json.dump(dataArray,f,indent=4)
+                # with open("dataArray.json","w")as f:
+                #     json.dump(dataArray,f,indent=4)
 
 
-                with open("dataArray1.json","w")as f:
-                    json.dump(dataArray1,f,indent=4)
+                # with open("dataArray1.json","w")as f:
+                #     json.dump(dataArray1,f,indent=4)
 
 
-                with open("dataArray2.json","w")as f:
-                    json.dump(dataArray2,f,indent=4)
+                # with open("dataArray2.json","w")as f:
+                #     json.dump(dataArray2,f,indent=4)
 
 
-                with open("dataArray3.json","w")as f:
-                    json.dump(dataArray3,f,indent=4)
+                # with open("dataArray3.json","w")as f:
+                #     json.dump(dataArray3,f,indent=4)
 
         
 
@@ -719,27 +684,27 @@ class FacebookService:
         # print(dataArray['data'][100])
         # print(dataArray['data'][500])
         # newvalues = json.dump(dataArray)
-        # if (TipoExtensionArray==1):
-        #     self.offline_dataset.create_event(params=dataArray)
-        # elif (TipoExtensionArray==2):
-        #     self.offline_dataset.create_event(params=dataArray)
-        #     self.offline_dataset.create_event(params=dataArray1)
-        # elif (TipoExtensionArray==3):
-        #     self.offline_dataset.create_event(params=dataArray)
-        #     self.offline_dataset.create_event(params=dataArray1)
-        #     self.offline_dataset.create_event(params=dataArray2)
-        # elif (TipoExtensionArray==4):
-        #     self.offline_dataset.create_event(params=dataArray)
-        #     self.offline_dataset.create_event(params=dataArray1)
-        #     self.offline_dataset.create_event(params=dataArray2)
-        #     self.offline_dataset.create_event(params=dataArray3)
+        if (TipoExtensionArray==1):
+            self.offline_dataset.create_event(params=dataArray)
+        elif (TipoExtensionArray==2):
+            self.offline_dataset.create_event(params=dataArray)
+            self.offline_dataset.create_event(params=dataArray1)
+        elif (TipoExtensionArray==3):
+            self.offline_dataset.create_event(params=dataArray)
+            self.offline_dataset.create_event(params=dataArray1)
+            self.offline_dataset.create_event(params=dataArray2)
+        elif (TipoExtensionArray==4):
+            self.offline_dataset.create_event(params=dataArray)
+            self.offline_dataset.create_event(params=dataArray1)
+            self.offline_dataset.create_event(params=dataArray2)
+            self.offline_dataset.create_event(params=dataArray3)
 
-        return dataArray
+        # return dataArray
 
 
 a=FacebookService()
 vista = a.upload_offline_conversion()
-print(vista)
+# print(vista)
 
 
 # app = Flask(__name__)
